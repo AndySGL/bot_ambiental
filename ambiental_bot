@@ -1,0 +1,84 @@
+import discord
+from discord.ext import commands
+
+TOKEN = "TU_TOKEN_AQUI"
+
+intents = discord.Intents.default()
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+reciclaje = {
+    "botella_plastica": {
+        "info": "Vacía la botella, enjuágala y colócala en el contenedor de plásticos.",
+        "degradacion": "450 años"
+    },
+    "lata": {
+        "info": "Lava la lata y deposítala en el contenedor de metales.",
+        "degradacion": "200 años"
+    },
+    "papel": {
+        "info": "Mantén el papel limpio y seco antes de reciclarlo.",
+        "degradacion": "2 a 5 meses"
+    },
+    "vidrio": {
+        "info": "Deposítalo en el contenedor de vidrio.",
+        "degradacion": "Más de 4000 años"
+    }
+}
+
+no_reciclables = {
+    "pila": "Guárdala en un recipiente seco y llévala a un centro especializado.",
+    "bombilla": "Busca un punto de recogida autorizado."
+}
+
+@bot.event
+async def on_ready():
+    print(f"✅ Bot conectado como {bot.user}")
+
+@bot.command()
+async def reciclar(ctx, *, objeto):
+    objeto = objeto.lower()
+
+    if objeto in reciclaje:
+        await ctx.send(
+            f"♻️ *{objeto.replace('_', ' ').title()}*\n"
+            f"{reciclaje[objeto]['info']}"
+        )
+    else:
+        await ctx.send("❌ No tengo información sobre ese objeto.")
+
+@bot.command()
+async def degradacion(ctx, *, objeto):
+    objeto = objeto.lower()
+
+    if objeto in reciclaje:
+        await ctx.send(
+            f"⏳ *{objeto.replace('_', ' ').title()}* tarda aproximadamente "
+            f"*{reciclaje[objeto]['degradacion']}* en degradarse."
+        )
+    else:
+        await ctx.send("❌ No tengo información sobre ese objeto.")
+
+@bot.command()
+async def desechar(ctx, *, objeto):
+    objeto = objeto.lower()
+
+    if objeto in no_reciclables:
+        await ctx.send(
+            f"⚠️ *{objeto.title()}*\n"
+            f"{no_reciclables[objeto]}"
+        )
+    else:
+        await ctx.send("❌ No tengo información sobre ese residuo.")
+
+@bot.command()
+async def ayudaeco(ctx):
+    await ctx.send(
+        "🌱 *Comandos disponibles*\n\n"
+        "!reciclar botella_plastica\n"
+        "!degradacion botella_plastica\n"
+        "!desechar pila"
+    )
+
+bot.run(TOKEN)
